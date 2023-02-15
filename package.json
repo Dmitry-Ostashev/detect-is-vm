@@ -1,0 +1,19 @@
+{
+  "name": "detect-is-vm",
+  "version": "0.0.1",
+  "description": "A node.js script example showing how to detect if it is running on Virtual Machine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dmitry-Ostashev/detect-is-vm.git"
+  },
+  "author": "Dmitry Ostashev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Dmitry-Ostashev/detect-is-vm/issues"
+  },
+  "homepage": "https://github.com/Dmitry-Ostashev/detect-is-vm#readme"
+}
