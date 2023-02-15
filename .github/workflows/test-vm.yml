@@ -1,0 +1,20 @@
+name: Test Check VM
+
+on:
+  workflow_dispatch:
+    
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
+      - name: Run test
+        run: node test.js
