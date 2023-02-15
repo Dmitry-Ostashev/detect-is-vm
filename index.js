@@ -19,11 +19,18 @@ function getCommandOutput (command) {
     });
 }
 
-async function isLinuxVM () {
+function isLinuxVM () {
     const LINUX_COMMAND = 'systemd-detect-virt';
-    const output        = await getCommandOutput(LINUX_COMMAND);
 
-    return VM_REGEX.test(output);
+    return new Promise(resolve => {
+        exec(LINUX_COMMAND, (error, stdout, stderr) => {
+            console.log(stdout);
+        }).on('exit', code => resolve(code === 0));
+    });
+    // const LINUX_REAL_MACHINE_REGEX = /none/ig;
+    // const output                   = await getCommandOutput(LINUX_COMMAND);
+
+    // return !LINUX_REAL_MACHINE_REGEX.test(output) || VM_REGEX.test(output);
 }
 
 async function isWinVM () {
