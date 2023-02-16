@@ -1,17 +1,21 @@
 "use strict";
 
+import { exec } from 'node:child_process';
+import { stderr } from 'node:process';
+import os from 'os';
+
 const WIN_PLATFORM = 'win32';
 const LINUX_PLATFORM = 'linux';
 const MAC_PLATFORM = 'darwin';
 const VM_REGEX = /virtual|vmWare|hyperv|wsl|hyper-v|microsoft/gi;
 
-const { exec } = require('node:child_process');
-const os       = require('os');
 
 function getCommandOutput (command) {
     return new Promise(resolve => {
         exec(command, (error, stdout, stderr) => {
             console.log(stdout);
+            console.log(stderr);
+            console.log(error);
 
             resolve(stdout);
         });
@@ -20,11 +24,18 @@ function getCommandOutput (command) {
 
 function isLinuxVM () {
     const LINUX_COMMAND = 'systemd-detect-virt';
+    const NOT_FOUND_REGEX = /systemd-detect-virt: not found/ig;
 
     return new Promise(resolve => {
+        let error = '';
+
         exec(LINUX_COMMAND, (error, stdout, stderr) => {
             console.log(stdout);
-        }).on('exit', code => resolve(code === 0));
+            console.log(stderr);
+
+            error = stderr;
+            console.log(error.message);
+        }).on('exit', code => resolve(!NOT_FOUND_REGEX.test(stderr) || code === 0));
     });
 }
 
@@ -58,4 +69,4 @@ async function checkIsVM () {
     return isVM;
 }
 
-module.exports = checkIsVM;
+export default checkIsVM;
