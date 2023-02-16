@@ -7,5 +7,5 @@ import isCI from 'is-ci';
 
     console.log(`Is virtual machine: ${isVM}`);
     console.log(`Is docker: ${isDocker()}`);
-    console.log(`Is CI: ${isCI()}`);
+    console.log(`Is CI: ${isCI}`);
 })();
