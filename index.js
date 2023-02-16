@@ -3,11 +3,10 @@
 const WIN_PLATFORM = 'win32';
 const LINUX_PLATFORM = 'linux';
 const MAC_PLATFORM = 'darwin';
-const VM_REGEX = /virtual|vmWare|hyperv|wsl/gi;
+const VM_REGEX = /virtual|vmWare|hyperv|wsl|hyper-v|microsoft/gi;
 
-const util = require('util');
-const { spawn, exec } = require('node:child_process');
-const os   = require('os');
+const { exec } = require('node:child_process');
+const os       = require('os');
 
 function getCommandOutput (command) {
     return new Promise(resolve => {
@@ -27,10 +26,6 @@ function isLinuxVM () {
             console.log(stdout);
         }).on('exit', code => resolve(code === 0));
     });
-    // const LINUX_REAL_MACHINE_REGEX = /none/ig;
-    // const output                   = await getCommandOutput(LINUX_COMMAND);
-
-    // return !LINUX_REAL_MACHINE_REGEX.test(output) || VM_REGEX.test(output);
 }
 
 async function isWinVM () {
@@ -46,10 +41,16 @@ async function isWinVM () {
     return biosNumberOutput === VM_BIOS || VM_REGEX.test(modelOutput) || VM_REGEX.test(manufacturerOutput);
 }
 
+async function isMacVM () {
+    const MAC_COMMAND = 'ioreg -l | grep -e Manufacturer -e \'Vendor Name\'';
+
+    return VM_REGEX.test(await getCommandOutput(MAC_COMMAND));
+}
 async function checkIsVM () {
     switch (os.platform()) {
-        case LINUX_PLATFORM: return await isLinuxVM();
+        case LINUX_PLATFORM: return isLinuxVM();
         case WIN_PLATFORM: return await isWinVM();
+        case MAC_PLATFORM: return await isMacVM();
         default:
             return false;
     }
