@@ -1,42 +1,29 @@
 "use strict";
 
-import { exec } from 'node:child_process';
-import { stderr } from 'node:process';
+import childProcess from 'node:child_process';
 import os from 'os';
+import { promisify } from 'util';
 
 const WIN_PLATFORM = 'win32';
 const LINUX_PLATFORM = 'linux';
 const MAC_PLATFORM = 'darwin';
-const VM_REGEX = /virtual|vmWare|hyperv|wsl|hyper-v|microsoft/gi;
+const VM_REGEX = /virtual|vmWare|hyperv|wsl|hyper-v|microsoft|parallels|qemu/gi;
 
+const exec = promisify(childProcess.exec);
 
-function getCommandOutput (command) {
-    return new Promise(resolve => {
-        exec(command, (error, stdout, stderr) => {
-            console.log(stdout);
-            console.log(stderr);
-            console.log(error);
+async function getCommandOutput (command) {
+    const { stdout } = await exec(command);
 
-            resolve(stdout);
-        });
-    });
+    return stdout;
 }
 
-function isLinuxVM () {
+async function isLinuxVM () {
     const LINUX_COMMAND = 'systemd-detect-virt';
     const NOT_FOUND_REGEX = /systemd-detect-virt: not found/ig;
 
-    return new Promise(resolve => {
-        let error = '';
-
-        exec(LINUX_COMMAND, (error, stdout, stderr) => {
-            console.log(stdout);
-            console.log(stderr);
-
-            error = stderr;
-            console.log(error.message);
-        }).on('exit', code => resolve(!NOT_FOUND_REGEX.test(stderr) || code === 0));
-    });
+    const { stderr, code } = await exec(LINUX_COMMAND);
+    
+    return !NOT_FOUND_REGEX.test(stderr) || code === 0;
 }
 
 async function isWinVM () {
