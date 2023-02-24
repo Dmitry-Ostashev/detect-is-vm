@@ -19,11 +19,18 @@ async function getCommandOutput (command) {
 
 async function isLinuxVM () {
     const LINUX_COMMAND = 'systemd-detect-virt';
-    const NOT_FOUND_REGEX = /systemd-detect-virt: not found/ig;
+    const NOT_FOUND_REGEX = /systemd-detect-virt: not found|is not recognized as an internal or external command/ig;
 
-    const { stderr, code } = await exec(LINUX_COMMAND);
-    
-    return !NOT_FOUND_REGEX.test(stderr) || code === 0;
+    let isVM = true;
+
+    try {
+        await exec(LINUX_COMMAND);
+    }
+    catch (e) {
+        isVM = !NOT_FOUND_REGEX.test(e.stderr);
+    }
+
+    return isVM;
 }
 
 async function isWinVM () {
